@@ -3,7 +3,7 @@ async function getDeviceFingerprint() {
         platform : navigator.platform,
         navigator:navigator.hardwareConcurrency,
         cpuCores: navigator.hardwareConcurrency || 'Unknown', // Number of logical CPU cores (device-specific)
-        
+        // more data will be added here
     };
     const deviceDataString = JSON.stringify(deviceData);
 
