@@ -3,10 +3,10 @@ async function getDeviceFingerprint() {
 
     const deviceData = {
         platform: navigator.platform,
-        cpuCores: navigator.hardwareConcurrency || 'Unknown', // Number of logical CPU cores
+        cpuCores: navigator.hardwareConcurrency || 'Unknown', 
         fonts: fonts, // Detected fonts
         screenResolution: `${screen.availWidth}x${screen.availHeight}`,
-        audioFingerprint: audioFingerprint,
+        
     };
 
     const deviceDataString = JSON.stringify(deviceData);
@@ -77,52 +77,6 @@ async function detectFonts() {
     body.removeChild(testElement);
 
     return availableFonts;
-}
-async function generateAudioFingerprint() {
-    // Create an audio context
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-    // Create an oscillator node (a simple tone generator)
-    const oscillator = audioContext.createOscillator();
-    oscillator.type = 'sine'; // A sine wave tone
-    oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // Frequency of A4 (440 Hz)
-
-    // Create a gain node to control the volume
-    const gainNode = audioContext.createGain();
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Lower the volume
-
-    // Connect the oscillator to the gain node, and then to the audio context's destination (i.e., speakers)
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    // Start the oscillator
-    oscillator.start();
-
-    // Stop the oscillator after a short time
-    setTimeout(() => {
-        oscillator.stop();
-        audioContext.close(); // Close the context
-    }, 1000); // Stop after 1 second
-
-    // Wait for the audio context to be fully loaded and the audio to be played
-    await new Promise(resolve => setTimeout(resolve, 1200));
-
-    // Use the analyser node to analyze the audio signal
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 2048;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-
-    // Connect the gain node to the analyser
-    gainNode.connect(analyser);
-
-    // Get the frequency data
-    analyser.getByteFrequencyData(dataArray);
-
-    // Create a hash of the frequency data using SHA-256
-    const audioFingerprint = await generateSha256Hash(dataArray.join(","));
-    
-    return audioFingerprint;
 }
 
 
