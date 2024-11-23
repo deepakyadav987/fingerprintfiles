@@ -4,17 +4,17 @@ async function getDeviceFingerprint() {
 
     const deviceData = {
         platform: navigator.platform,
-        cpuCores: navigator.hardwareConcurrency || 'Unknown', // Number of logical CPU cores
-        fonts: fonts, // Detected fonts
+        cpuCores: navigator.hardwareConcurrency || 'Unknown', 
+        colorDepth: screen.colorDepth || 'Unknown',
         language: normalizeLanguage(navigator.language) || 'Unknown',
         timezone: getNormalizedTimezone()|| 'Unknown',
+        fonts: fonts, // detectFonts function
+        canvas:getCanvasFingerprint()
+        
         // deviceMemory: navigator.deviceMemory || 'Unknown',
         //screenResolution: `${screen.availWidth}x${screen.availHeight}`,
         //audioString: audioString,
-        colorDepth: screen.colorDepth || 'Unknown',
-        canvas:getCanvasFingerprint()
-    };
-
+        };
     const deviceDataString = JSON.stringify(deviceData);
 
     // Hashing the combined data to generate a fingerprint
@@ -42,7 +42,7 @@ function getNormalizedTimezone() {
 }
 async function detectFonts() {
     const baseFonts = ['monospace', 'sans-serif', 'serif'];
-    const testString = "abcdefghijklmnopqrstuvwxyz0123456789";
+    const testString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     const testSize = "72px";
     
     const body = document.getElementsByTagName("body")[0];
@@ -66,7 +66,6 @@ async function detectFonts() {
         "Georgia", "Comic Sans MS", "Impact", "Tahoma", "Trebuchet MS",
         "Calibri", "Helvetica", "Comic Sans", "Futura", "Lucida Sans"
     ];
-
     const availableFonts = [];
     fontList.forEach((font) => {
         let isFontAvailable = false;
@@ -86,7 +85,6 @@ async function detectFonts() {
     });
 
     body.removeChild(testElement);
-
     return availableFonts;
 }
 
@@ -106,10 +104,7 @@ function getCanvasFingerprint() {
 
     const pixelData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
-    const canvasData = Array.from(pixelData)
-        .slice(0, 500) 
-        .join(',');
-
+    const canvasData = Array.from(pixelData).slice(0, 500) .join(',');
     return canvasData;
 }
 getDeviceFingerprint();
