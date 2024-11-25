@@ -108,8 +108,6 @@ function getCanvasFingerprint() {
     const canvasData = Array.from(pixelData).slice(0, 500) .join(',');
     return canvasData;
 }
-
-   // Check if audiooutput devices are missing in Firefox
     async function getMediaDevices() {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
