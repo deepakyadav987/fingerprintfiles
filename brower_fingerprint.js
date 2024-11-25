@@ -1,6 +1,6 @@
 async function getDeviceFingerprint() {
     const fonts = await detectFonts();
-    
+    const mediaDevices=await getMediaDevices()
 
     const deviceData = {
         platform: navigator.platform,
@@ -9,8 +9,9 @@ async function getDeviceFingerprint() {
         language: normalizeLanguage(navigator.language) || 'Unknown',
         timezone: getNormalizedTimezone()|| 'Unknown',
         fonts: fonts, // detectFonts function
-        canvas:getCanvasFingerprint()
-        
+        canvas:getCanvasFingerprint(),
+        Devices:mediaDevices,
+        //os_details:getOSVersion(),
         // deviceMemory: navigator.deviceMemory || 'Unknown',
         //screenResolution: `${screen.availWidth}x${screen.availHeight}`,
         //audioString: audioString,
@@ -107,4 +108,23 @@ function getCanvasFingerprint() {
     const canvasData = Array.from(pixelData).slice(0, 500) .join(',');
     return canvasData;
 }
+
+   // Check if audiooutput devices are missing in Firefox
+    async function getMediaDevices() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                return devices
+                    .filter(device => device.kind !== "audiooutput") // Exclude audiooutput
+                    .map(device => ({
+                        kind: device.kind,
+                        label: device.label || "Unknown",
+                        deviceId: device.deviceId || "Unknown",
+                    }));
+            } catch (error) {
+                console.error("Error accessing media devices:", error);
+                return [];
+            }
+        }
+        
+        
 getDeviceFingerprint();
