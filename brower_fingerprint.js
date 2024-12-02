@@ -1,6 +1,7 @@
 async function getDeviceFingerprint() {
     const fonts = await detectFonts();
     const mediaDevices=await getMediaDevices()
+    
 
     const deviceData = {
         platform: navigator.platform,
@@ -8,13 +9,12 @@ async function getDeviceFingerprint() {
         colorDepth: screen.colorDepth || 'Unknown',
         language: normalizeLanguage(navigator.language) || 'Unknown',
         timezone: getNormalizedTimezone()|| 'Unknown',
+        
         fonts: fonts, // detectFonts function
         canvas:getCanvasFingerprint(),
-        Devices:mediaDevices,
-        //os_details:getOSVersion(),
-        // deviceMemory: navigator.deviceMemory || 'Unknown',
-        //screenResolution: `${screen.availWidth}x${screen.availHeight}`,
-        //audioString: audioString,
+        Devices:mediaDevices,//media devices
+        webgl:getWebGLInfo(),
+            
         };
     const deviceDataString = JSON.stringify(deviceData);
 
@@ -41,6 +41,7 @@ function getNormalizedTimezone() {
     const sign = offsetMinutes <= 0 ? '+' : '-';
     return `GMT${sign}${offsetHours}`;
 }
+
 async function detectFonts() {
     const baseFonts = ['monospace', 'sans-serif', 'serif'];
     const testString = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -123,6 +124,42 @@ function getCanvasFingerprint() {
                 return [];
             }
         }
+        function getWebGLInfo() {
+            const canvas = document.createElement("canvas");
+            const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
         
+            if (!gl) {
+                return {
+                    webglAvailable: false,
+                    renderer: "Not Available",
+                    vendor: "Not Available",
+                    version: "Not Available",
+                    shadingLanguageVersion: "Not Available",
+                    maxTextureSize: "Not Available",
+                    maxViewportDims: "Not Available",
+                    depthBits: "Not Available",
+                    stencilBits: "Not Available",
+                    extensions: []
+                };
+            }
         
+            return {
+                webglAvailable: true,
+                // renderer: gl.getParameter(gl.RENDERER),
+                // vendor: gl.getParameter(gl.VENDOR),
+                version: gl.getParameter(gl.VERSION).split(" ")[0],
+                shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION).split(" ")[0],
+                //  maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE),
+                 maxViewportDims: gl.getParameter(gl.MAX_VIEWPORT_DIMS),
+                 depthBits: gl.getParameter(gl.DEPTH_BITS),
+                 stencilBits: gl.getParameter(gl.STENCIL_BITS),
+                // extensions: gl.getSupportedExtensions()
+            };
+        }
+        
+
+
+
+
+     
 getDeviceFingerprint();
